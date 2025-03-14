@@ -30,4 +30,9 @@ echo output $directory
 echo descomprimir $uncompress
 echo filtrado $filter
 
-wget $filename -P $directory
+while read -r line
+	do echo linea nueva
+	echo $line
+done < $filename
+
+# wget $filename -P $directory
