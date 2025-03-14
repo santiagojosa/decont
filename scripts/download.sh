@@ -32,5 +32,17 @@ echo filtrado $filter
 
 while read -r line
 do
-	wget $line -P $directory
+	if [ "$uncompress" == yes ]
+	then
+		echo Descargando...
+		wget $line -P $directory
+		echo Archivo descargado
+		echo Descomprimiendo...
+		gunzip -k $directory/$(basename $line)
+		echo Archivo descomprimido
+	else
+		echo Descargando...
+		wget $line -P $directory
+		echo Archivo descargado
+	fi
 done < $filename
