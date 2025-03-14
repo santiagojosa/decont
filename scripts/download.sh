@@ -18,9 +18,16 @@
 #   CCAGGATTTACAGACTTTAAA
 #
 #   If $4 == "another" only the **first two sequence** should be output
-mkdir -P ./data/
-
 filename=$1
 directory=$2
 uncompress=$3
 filter=$4
+
+mkdir -p $directory
+
+echo input $filename
+echo output $directory
+echo descomprimir $uncompress
+echo filtrado $filter
+
+wget $filename -P $directory
