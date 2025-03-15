@@ -18,7 +18,8 @@
 #   CCAGGATTTACAGACTTTAAA
 #
 #   If $4 == "another" only the **first two sequence** should be output
-filename=$1
+filepath=$1
+filename=$(basename $filepath)
 directory=$2
 uncompress=$3
 filter=$4
@@ -30,19 +31,32 @@ echo output $directory
 echo descomprimir $uncompress
 echo filtrado $filter
 
-while read -r line
-do
-	if [ "$uncompress" == yes ]
-	then
-		echo Descargando...
-		wget $line -P $directory
-		echo Archivo descargado
-		echo Descomprimiendo...
-		gunzip -k $directory/$(basename $line)
-		echo Archivo descomprimido
-	else
-		echo Descargando...
-		wget $line -P $directory
-		echo Archivo descargado
-	fi
-done < $filename
+if [ "$uncompress" == yes ]
+then
+	echo Descargando...
+	wget $filepath -P $directory 
+	echo Archivo descargado
+	echo Descomprimiendo...
+	gunzip -k $directory/$filename
+	echo Archivo descomprimido
+else
+	echo Descargando...
+	wget $filepath -P $directory
+	echo Archivo descargado
+fi
+
+# Filtrado del archivo si se especifica una palabra en el header
+if [ -n "$filter" ]
+then
+	echo 🔍 Filtrando $directory/$filename con patrón: $filter
+	output_file=$directory/filtered_$(basename $filename .gz)
+	seqkit grep -r -n -p "$filter" $directory/$filename -v -o $output_file || { echo "❌ Error al filtrar $filename"; exit 1; }
+	# ejecuta seqkit grep con los argumentos:
+	# -r: usa regexp
+	# -n: busca en el nombre, no solo ID
+	# -p: patrón a buscar
+	# -v: invertir la búsqueda, para excluir
+	# -o: archivo de salida
+	# o muestra un mensaje de error y sale mediante error code 1
+	echo "✅ Archivo filtrado: $output_file"
+fi
