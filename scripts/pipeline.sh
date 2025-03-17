@@ -15,8 +15,9 @@ bash scripts/download.sh $contaminants_url res yes "small nuclear"
 # Index the contaminants file
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
 
+list_of_sample_ids=$(ls data | grep fastq | cut -d "-" -f1 | sort | uniq)
 # Merge the samples into a single file
-for sid in $(<list_of_sample_ids>) #TODO
+for sid in $list_of_sample_ids
 do
     bash scripts/merge_fastqs.sh data out/merged $sid
 done
