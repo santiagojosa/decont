@@ -1,12 +1,16 @@
+#!/usr/bin/bash
+input_urls=$1
+contaminants_url=$2
+
 #Download all the files specified in data/filenames
-for url in $(<list_of_urls>) #TODO
+for url in $(cat $input_urls)
 do
     bash scripts/download.sh $url data
 done
 
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
-bash scripts/download.sh <contaminants_url> res yes #TODO
+bash scripts/download.sh $contaminants_url res yes "small nuclear"
 
 # Index the contaminants file
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
