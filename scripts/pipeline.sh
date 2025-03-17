@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 input_urls=$1
 contaminants_url=$2
 
