@@ -1,6 +1,6 @@
 #!/bin/bash
 echo
-echo "➡️ Comenzando pipeline de descontaminación de muestras..."
+echo "➡️  Comenzando pipeline de descontaminación de muestras..."
 (printf -- '=%.0s' {1..50}; printf "\n\n")
 
 input_urls=$1
@@ -9,7 +9,7 @@ contaminants_url=$2
 #contaminants_url=https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz
 
 #Download all the files specified in data/filenames
-echo "➡️ Descargando archivos fastq.gz..."
+echo "➡️  Descargando archivos fastq.gz..."
 for url in $(cat $input_urls)
 do
     bash scripts/download.sh $url data
@@ -18,17 +18,16 @@ done
 
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
-echo "➡️ Descargando archivo de contaminantes..."
+echo "➡️  Descargando archivo de contaminantes..."
 bash scripts/download.sh $contaminants_url res yes "small nuclear"
 (printf -- '=%.0s' {1..50}; printf "\n\n")
 
 # Index the contaminants file
-echo "➡️ Indexando archivo de contaminantes..."
+echo "➡️  Indexando archivo de contaminantes..."
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
 (printf -- '=%.0s' {1..50}; printf "\n\n")
-(printf -- '=%.0s' {1..50}; printf "\n\n")
 
-echo "➡️ Juntando archivos fastq.gz..."
+echo "➡️  Juntando archivos fastq.gz..."
 list_of_sample_ids=$(ls data | grep fastq | cut -d "-" -f1 | sort | uniq)
 # Merge the samples into a single file
 for sid in $list_of_sample_ids
@@ -37,7 +36,7 @@ do
 done
 
 # run cutadapt for all merged files
-echo "➡️ Eliminando adaptadores..."
+echo "➡️  Eliminando adaptadores..."
 mkdir -p log/cutadapt
 mkdir -p out/trimmed
 for fname in out/merged/*.fastq.gz
@@ -48,7 +47,7 @@ done
 (printf -- '=%.0s' {1..50}; printf "\n\n")
 
 # run STAR for all trimmed files
-echo "➡️ Eliminando contaminantes..."
+echo "➡️  Eliminando contaminantes..."
 for fname in out/trimmed/*.fastq.gz
 do
     # you will need to obtain the sample ID from the filename
@@ -66,7 +65,7 @@ done
 # - cutadapt: Reads with adapters and total basepairs
 # - star: Percentages of uniquely mapped reads, reads mapped to multiple loci, and to too many loci
 # tip: use grep to filter the lines you're interested in 
-echo "➡️ Creando archivo de logs..."
+echo "➡️  Creando archivo de logs..."
 for fname in out/trimmed/*.fastq.gz
 do
     sid=$(basename $fname .trimmed.fastq.gz)
