@@ -22,23 +22,35 @@ do
     bash scripts/merge_fastqs.sh data out/merged $sid
 done
 
-# TODO: run cutadapt for all merged files
-# cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
-#     -o <trimmed_file> <input_file> > <log_file>
+mkdir -p log/cutadapt
+mkdir -p out/trimmed
+# run cutadapt for all merged files
+for fname in out/merged/*.fastq.gz
+do
+    cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
+        -o out/trimmed/$(basename $fname .fastq.gz).trimmed.fastq.gz $fname >> log/cutadapt/$(basename $fname).log
+done
 
-# TODO: run STAR for all trimmed files
+# run STAR for all trimmed files
+mkdir -p log/star
 for fname in out/trimmed/*.fastq.gz
 do
     # you will need to obtain the sample ID from the filename
-    sid=#TODO
-    # mkdir -p out/star/$sid
-    # STAR --runThreadN 4 --genomeDir res/contaminants_idx \
-    #    --outReadsUnmapped Fastx --readFilesIn <input_file> \
-    #    --readFilesCommand gunzip -c --outFileNamePrefix <output_directory>
+    sid=$(basename $fname .trimmed.fastq.gz)
+    echo $sid
+    mkdir -p out/star/$sid
+    STAR --runThreadN 4 --genomeDir res/contaminants_idx \
+       --outReadsUnmapped Fastx --readFilesIn $fname \
+       --readFilesCommand gunzip -c --outFileNamePrefix out/star/$sid/
 done 
 
 # TODO: create a log file containing information from cutadapt and star logs
 # (this should be a single log file, and information should be *appended* to it on each run)
 # - cutadapt: Reads with adapters and total basepairs
 # - star: Percentages of uniquely mapped reads, reads mapped to multiple loci, and to too many loci
-# tip: use grep to filter the lines you're interested in
+# tip: use grep to filter the lines you're interested in 
+grep 'Reads with adapters' log/cutadapts/log_file >> log_file
+grep 'Total basepairs' log/cutadapt/log_file >> log_file
+grep grep 'Uniquely mapped reads %' out/star/sample/Log.final.out >> log_file
+grep '% of reads mapped to multiple loci' out/star/C57BL_6NJ/Log.final.out >> log_file
+grep '% of reads mapped to too many loci' out/star/C57BL_6NJ/Log.final.out 
