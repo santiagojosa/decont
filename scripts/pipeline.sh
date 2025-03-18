@@ -28,11 +28,10 @@ mkdir -p out/trimmed
 for fname in out/merged/*.fastq.gz
 do
     cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
-        -o out/trimmed/$(basename $fname .fastq.gz).trimmed.fastq.gz $fname >> log/cutadapt/$(basename $fname).log
+        -o out/trimmed/$(basename $fname .fastq.gz).trimmed.fastq.gz $fname >> log/cutadapt/$(basename $fname .fastq.gz).log
 done
 
 # run STAR for all trimmed files
-mkdir -p log/star
 for fname in out/trimmed/*.fastq.gz
 do
     # you will need to obtain the sample ID from the filename
@@ -49,8 +48,14 @@ done
 # - cutadapt: Reads with adapters and total basepairs
 # - star: Percentages of uniquely mapped reads, reads mapped to multiple loci, and to too many loci
 # tip: use grep to filter the lines you're interested in 
-grep 'Reads with adapters' log/cutadapts/log_file >> log_file
-grep 'Total basepairs' log/cutadapt/log_file >> log_file
-grep grep 'Uniquely mapped reads %' out/star/sample/Log.final.out >> log_file
-grep '% of reads mapped to multiple loci' out/star/C57BL_6NJ/Log.final.out >> log_file
-grep '% of reads mapped to too many loci' out/star/C57BL_6NJ/Log.final.out 
+echo "Logs from cutadapt and STAR for sample" $(basename $fname .trimmed.fastq.gz) >> log/pipeline.log
+(printf -- '-%.0s' {1..50}; echo) >> log/pipeline.log
+printf "Logs from cutadapt\n\n" >> log/pipeline.log
+grep 'Reads with adapters' log/cutadapt/$(basename $fname .trimmed.fastq.gz).log >> log/pipeline.log
+grep 'Total basepairs' log/cutadapt/$(basename $fname .trimmed.fastq.gz).log >> log/pipeline.log
+(printf -- '-%.0s' {1..50}; echo) >> log/pipeline.log
+printf "Logs from STAR\n\n" >> log/pipeline.log
+grep 'Uniquely mapped reads %' out/star/$(basename $fname .trimmed.fastq.gz)/Log.final.out >> log/pipeline.log
+grep '% of reads mapped to multiple loci' out/star/$(basename $fname .trimmed.fastq.gz)/Log.final.out >> log/pipeline.log
+grep '% of reads mapped to too many loci' out/star/$(basename $fname .trimmed.fastq.gz)/Log.final.out >> log/pipeline.log
+(printf -- '=%.0s' {1..50}; printf "\n\n") >> log/pipeline.log
