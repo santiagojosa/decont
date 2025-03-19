@@ -39,7 +39,7 @@ echo ✅ Archivo descargado
 
 if [ "$uncompress" == "yes" ]
 then
-	echo ➡️  Descomprimiendo $filename...
+	echo "➡️  Descomprimiendo $filename..."
 	gunzip -k $directory/$filename
 	echo ✅ Archivo descomprimido
 	(printf -- '-%.0s' {1..50}; echo)
