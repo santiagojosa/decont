@@ -9,7 +9,7 @@ then
     echo
     echo "➡️ ➡️  Limpiando el entorno de trabajo. Borrando archivos de las carpetas data (salvo data/urls), res, log y out..."
     bash scripts/cleanup.sh data res log out
-    printf -- '=%.0s' {1..150}; printf "\n\n"
+    printf -- '=%.0s' {1..150}; printf "\n"
 fi
 
 echo
@@ -18,7 +18,7 @@ printf -- '=%.0s' {1..150}; printf "\n\n"
 
 input_urls=$1
 contaminants_url=$2
-contaminants_filter=$3
+contaminants_filter="$3"
 #input_urls=data/urls
 #contaminants_url=https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz
 #contaminants_filter="small nuclear"
@@ -27,20 +27,37 @@ contaminants_filter=$3
 echo "➡️ ➡️  Descargando archivos fastq.gz..."
 for url in $(cat $input_urls)
 do
-    bash scripts/download.sh $url data
+    if [ -f data/$(basename $url) ]
+    then
+        echo "⚠️  Archivo $(basename $url) ya estaba descargado. No se vuelve a descargar"
+    else
+        bash scripts/download.sh $url data
+    fi
 done
 printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
 echo "➡️ ➡️  Descargando archivo de contaminantes..."
-bash scripts/download.sh $contaminants_url res yes $contaminants_filter
+if [ -f res/contaminants.fasta ]
+then
+    echo "⚠️ ⚠️  Archivo de contaminantes ya estaba descargado, extraido y filtrado. No se vuelve a procesar"
+else
+    bash scripts/download.sh $contaminants_url res yes "$contaminants_filter"
+fi
 printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # Index the contaminants file
 echo "➡️ ➡️  Indexando archivo de contaminantes..."
-bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
-printf -- '=%.0s' {1..150}; printf "\n\n"
+if [ -d res/*_idx ] && [ "$(ls -A res/*_idx)" ]
+then
+    echo "⚠️  Archivo de contaminantes ya indexado. No se vuelve a indexar"
+    printf -- '=%.0s' {1..150}; printf "\n\n"
+else
+    bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
+    printf -- '=%.0s' {1..150}; printf "\n\n"
+fi
+
 
 echo "➡️ ➡️  Juntando archivos fastq.gz..."
 list_of_sample_ids=$(ls data | grep fastq | cut -d "-" -f1 | sort | uniq)
@@ -48,9 +65,15 @@ list_of_sample_ids=$(ls data | grep fastq | cut -d "-" -f1 | sort | uniq)
 for sid in $list_of_sample_ids
 do
     echo "➡️  $sid"
-    bash scripts/merge_fastqs.sh data out/merged $sid
+    if [ -f out/merged/$sid.fastq.gz ]
+    then
+        echo "⚠️  Archivo $sid.fastq.gz ya estaba creado. No se vuelve a unir"
+    else
+        bash scripts/merge_fastqs.sh data out/merged $sid
+        echo ✅ Archivos $sid.fastq.gz unidos
+    fi
 done
-echo ✅ Archivos fastq.gz unidos
+
 printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # run cutadapt for all merged files
@@ -61,10 +84,15 @@ for fname in out/merged/*.fastq.gz
 do
     id=$(basename $fname .fastq.gz)
     echo "➡️  $sid"
-    cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
+    if [ -f out/trimmed/$id.trimmed.fastq.gz ]
+    then
+        echo "⚠️  Archivo $id.trimmed.fastq.gz ya estaba creado. No se vuelve a crear"
+    else
+        cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
         -o out/trimmed/$id.trimmed.fastq.gz $fname >> log/cutadapt/$id.log
+        echo ✅ Adaptadores eliminados
+    fi
 done
-echo ✅ Adaptadores eliminados
 printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # run STAR for all trimmed files
@@ -75,11 +103,17 @@ do
     sid=$(basename $fname .trimmed.fastq.gz)
     echo "➡️  $sid"
     mkdir -p out/star/$sid
-    STAR --runThreadN 4 --genomeDir res/contaminants_idx \
+    if [ -f out/star/$sid/Unmapped.out.mate1 ]
+    then
+        echo "⚠️  Archivo Unmapped.out.mate1 ya estaba creado. No se vuelve a crear"
+    else
+        STAR --runThreadN 4 --genomeDir res/contaminants_idx \
        --outReadsUnmapped Fastx --readFilesIn $fname \
        --readFilesCommand gunzip -c --outFileNamePrefix out/star/$sid/
+        echo ✅ Contaminantes eliminados
+    fi
+
 done
-echo ✅ Contaminantes eliminados
 printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # create a log file containing information from cutadapt and star logs
