@@ -24,25 +24,26 @@ directory=$2
 uncompress=$3
 filter=$4
 
-echo $url
-echo $filename
-echo $directory
-echo $uncompress
-echo $filter
+echo from url: $url
+echo filename: $filename
+echo to directory: $directory/
+if [ "$uncompress" == "yes" ]; then echo uncompress: $uncompress; fi
+if [ -n "$filter" ]; then echo filter out containing: $filter; fi
 
 mkdir -p $directory
 
+echo ""
 echo "➡️  Descargando $filename..."
 wget $url -P $directory 
 echo ✅ Archivo descargado
-(printf -- '-%.0s' {1..50}; echo) 
+(printf -- '-%.0s' {1..150}; echo) 
 
 if [ "$uncompress" == "yes" ]
 then
 	echo "➡️  Descomprimiendo $filename..."
 	gunzip -k $directory/$filename
 	echo ✅ Archivo descomprimido
-	(printf -- '-%.0s' {1..50}; echo)
+	(printf -- '-%.0s' {1..150}; echo)
 fi
 
 # Filtrado del archivo si se especifica una palabra en el header
