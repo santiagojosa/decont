@@ -1,0 +1,11 @@
+name: env_entrega_linux
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - seqkit
+  - star
+  - cutadapt
+  - ca-certificates
+  - openssl
+prefix: /home/vant/miniforge3/envs/env_entrega_linux
