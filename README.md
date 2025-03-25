@@ -255,3 +255,8 @@ and continue.
   more of the following arguments: "data", "resources", "output", "logs". If no
   arguments are passed then it should remove everything.
 
+## How to run this pipeline
+
+This pipeline takes three arguments: file with urls to download, url of contaminants, and a filter for filtering out contaminants list.
+Example: bash scripts/pipeline.sh data/urls https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz "small nuclear"
+
