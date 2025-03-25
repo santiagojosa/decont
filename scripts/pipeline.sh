@@ -2,10 +2,15 @@
 # El pipeline toma como argumentos: archivo con urls de data, url de contaminantes y filtro de contaminantes
 # Ejemplo de uso: bash scripts/pipeline.sh data/urls https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz "small nuclear"
 
-echo
-echo "➡️ ➡️  Limpiando el entorno de trabajo. Borrando archivos de las carpetas data (salvo data/urls), res, log y out..."
-bash scripts/cleanup.sh data res log out
-printf -- '=%.0s' {1..150}; printf "\n\n"
+echo "➡️ ➡️  ¿Deseas limpiar el entorno de trabajo antes de comenzar el pipeline? (s/n)"
+read clean
+if [ "$clean" = "s" ]
+then
+    echo
+    echo "➡️ ➡️  Limpiando el entorno de trabajo. Borrando archivos de las carpetas data (salvo data/urls), res, log y out..."
+    bash scripts/cleanup.sh data res log out
+    printf -- '=%.0s' {1..150}; printf "\n\n"
+fi
 
 echo
 echo "➡️ ➡️  Comenzando pipeline de descontaminación de muestras..."
