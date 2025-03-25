@@ -14,12 +14,13 @@ fi
 
 for dir in "$@" # Para cada directorio pasado como argumento
 do
-    if [ "$dir" = "data" ] # Si el directorio es data
+    if [ "$dir" = "data" ] && [ $(ls -1 "$dir" | wc -l) -gt 1 ] # Si el directorio es data y tiene mas que el archivo urls
     then
         echo "Limpiando $dir excepto $dir/urls"
         rm -rv "$dir"/!(urls)
-    elif [ "$(ls "$dir")" ] # Si el directorio no esta vacio
+    elif [ "$dir" != "data" ] && [ "$(ls "$dir")" ] # Si el directorio no es data y no esta vacio
     then
+        echo "Limpiando $dir"
         rm -rv "$dir"/*
     else # Si el directorio esta vacio
         echo "$dir esta vacio"

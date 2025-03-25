@@ -3,6 +3,11 @@
 # Ejemplo de uso: bash scripts/pipeline.sh data/urls https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz "small nuclear"
 
 echo
+echo "➡️ ➡️  Limpiando el entorno de trabajo. Borrando archivos de las carpetas data (salvo data/urls), res, log y out..."
+bash scripts/cleanup.sh data res log out
+printf -- '=%.0s' {1..150}; printf "\n\n"
+
+echo
 echo "➡️ ➡️  Comenzando pipeline de descontaminación de muestras..."
 printf -- '=%.0s' {1..150}; printf "\n\n"
 
