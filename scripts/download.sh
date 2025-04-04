@@ -34,16 +34,16 @@ mkdir -p $directory
 
 echo ""
 if [ -f data/$(basename $url) ]
-then
-    echo "⚠️  Archivo $(basename $url) ya estaba descargado. No se vuelve a descargar"
-else
-    echo "➡️  Descargando $filename..."
-	wget $url -P $directory 
-	echo ✅ Archivo descargado
+    then
+        echo "⚠️  Archivo $(basename $url) ya estaba descargado. No se vuelve a descargar"
+    else
+        echo "➡️  Descargando $filename..."
+		wget $url -P $directory 
+		echo ✅ Archivo descargado
 fi
 
 echo "➡️ Comprobando MD5 del archivo descargado..."
-md5_online=$(curl $url.md5 | cut -d' ' -f1) # md5sum of the online file
+md5_online=$(curl -sS $url.md5 | cut -d' ' -f1) # md5sum of the online file
 echo "MD5 online file: $md5_online"
 md5_downloaded=$(md5sum $directory/$(basename $url) | cut -d' ' -f1) # md5sum of the downloaded file
 echo "MD5 downloaded file: $md5_downloaded"
@@ -51,7 +51,7 @@ if [ "$md5_online" == "$md5_downloaded" ]
 then
 	echo ✅ MD5 check correcto
 else
-	echo ❌ Error en el MD5 check
+	echo ❌ Error en el MD5 check >&2 #redirecciona el error a stderr
 	exit 1
 fi
 (printf -- '-%.0s' {1..150}; echo) 
