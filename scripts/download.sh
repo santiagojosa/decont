@@ -33,9 +33,14 @@ if [ -n "$filter" ]; then echo filter out containing: $filter; fi
 mkdir -p $directory
 
 echo ""
-echo "➡️  Descargando $filename..."
-wget $url -P $directory 
-echo ✅ Archivo descargado
+if [ -f data/$(basename $url) ]
+then
+    echo "⚠️  Archivo $(basename $url) ya estaba descargado. No se vuelve a descargar"
+else
+    echo "➡️  Descargando $filename..."
+	wget $url -P $directory 
+	echo ✅ Archivo descargado
+fi
 
 echo "➡️ Comprobando MD5 del archivo descargado..."
 md5_online=$(curl $url.md5 | cut -d' ' -f1) # md5sum of the online file
