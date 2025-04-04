@@ -25,15 +25,7 @@ contaminants_filter="$3"
 
 #Download all the files specified in data/filenames
 echo "➡️ ➡️  Descargando archivos fastq.gz..."
-for url in $(cat $input_urls)
-do
-    if [ -f data/$(basename $url) ]
-    then
-        echo "⚠️  Archivo $(basename $url) ya estaba descargado. No se vuelve a descargar"
-    else
-        bash scripts/download.sh $url data
-    fi
-done
+xargs -a "$input_urls" -I {} bash scripts/download.sh {} data
 printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # Download the contaminants fasta file, uncompress it, and
@@ -41,7 +33,7 @@ printf -- '=%.0s' {1..150}; printf "\n\n"
 echo "➡️ ➡️  Descargando archivo de contaminantes..."
 if [ -f res/contaminants.fasta ]
 then
-    echo "⚠️ ⚠️  Archivo de contaminantes ya estaba descargado, extraido y filtrado. No se vuelve a procesar"
+    echo "⚠️  Archivo de contaminantes ya estaba descargado, extraido y filtrado. No se vuelve a procesar"
 else
     bash scripts/download.sh $contaminants_url res yes "$contaminants_filter"
 fi
