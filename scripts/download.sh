@@ -55,6 +55,7 @@ then
 	echo ✅ MD5 check correcto
 else
 	echo ❌ Error en el MD5 check | tee -a "$TMP_ERR" #se ve el mensaje y lo redirecciona el error a stderr
+	(printf -- '-%.0s' {1..150}; echo) 
 	exit 1
 fi
 (printf -- '-%.0s' {1..150}; echo) 
