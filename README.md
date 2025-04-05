@@ -257,6 +257,14 @@ and continue.
 
 ## How to run this pipeline
 
+This pipeline runs the process with the basic processes. It must be executed from the top-level directory of the project.
+
+FIRST OF ALL!!! After cloning the repository, create a conda environment using
+
+```shell
+conda env create -f envs/decont.yaml
+```
+
 This pipeline takes three arguments: file with urls to download, url of contaminants, and a filter for filtering out contaminants list.
 
 Example: 
