@@ -18,17 +18,20 @@
 #   CCAGGATTTACAGACTTTAAA
 #
 #   If $4 == "another" only the **first two sequence** should be output
+
+#Este script se ejecuta asi:
+# ash scripts/download.sh url directory uncompress filter_word
 url=$1
 filename=$(basename $url)
 directory=$2
-uncompress=$3
-filter=$4
+uncompress=$3 #"yes" or "no"
+filter=$4 #una palabra para dejar fuera las secuencias que la contengan en el header
 
 echo from url: $url
 echo filename: $filename
 echo to directory: $directory/
-if [ "$uncompress" == "yes" ]; then echo uncompress: $uncompress; fi
-if [ -n "$filter" ]; then echo filter out containing: $filter; fi
+if [ "$uncompress" == "yes" ]; then echo "uncompress: $uncompress"; fi
+if [ -n "$filter" ]; then echo "filter out containing: $filter"; fi
 
 mkdir -p $directory
 

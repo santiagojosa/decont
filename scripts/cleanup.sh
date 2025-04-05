@@ -6,7 +6,7 @@ shopt -s extglob # Habilito el uso de patrones extendidos
 
 if [ $# -eq 0 ] # Elimina todo el directorio de trabajo
 then
-    echo "Limpiando directorio de trabajo"
+    echo "Eliminando todo el contenido del directorio de trabajo"
     rm -rv "$PWD"/*
     exit 0
 fi

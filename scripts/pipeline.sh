@@ -8,7 +8,7 @@ if [ "$clean" = "s" ]
 then
     echo
     echo "➡️ ➡️  Limpiando el entorno de trabajo. Borrando archivos de las carpetas data (salvo data/urls), res, log y out..."
-    bash scripts/cleanup.sh data res log out
+    bash scripts/cleanup.sh data res log out #Elimino archivos de esas carpetas para realizar una ejecución limpia
     printf -- '=%.0s' {1..150}; printf "\n"
 fi
 
@@ -25,8 +25,9 @@ contaminants_filter="$3"
 
 #Download all the files specified in data/filenames
 echo "➡️ ➡️  Descargando archivos fastq.gz..."
+export TMP_ERR=$(mktemp log/stderr_download_XXXXXX) #Variable temporal DE ENTORNO en carpeta log para almacenar errores
 trap 'rm -f "$TMP_ERR"' EXIT INT TERM #Borra el archivo temporal al salir del script, haya error o no, o si detengo el script
-xargs -a "$input_urls" -I {} bash scripts/download.sh {} data #xargs lee el archivo linea por linea y ejecuta el script metiendo en {} cada url
+xargs -a "$input_urls" -I {} bash scripts/download.sh {} data #xargs lee el archivo linea por linea y ejecuta el script download.sh metiendo en {} cada url
 if grep -q 'Error en el MD5 check' "$TMP_ERR"; then #Comprueba si el archivo temporal tiene contenido, que sera la salida de error
   echo "❌❌ Se produjeron errores al descargar archivos. Error encontrado:"
   cat "$TMP_ERR"
@@ -47,7 +48,7 @@ printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # Index the contaminants file
 echo "➡️ ➡️  Indexando archivo de contaminantes..."
-if [ -d res/*_idx ] && [ "$(ls -A res/*_idx)" ]
+if [ -d res/*_idx ] && [ "$(ls -A res/*_idx)" ] #Si existe una carpeta con indices en res y no esta vacia
 then
     echo "⚠️  Archivo de contaminantes ya indexado. No se vuelve a indexar"
     printf -- '=%.0s' {1..150}; printf "\n\n"
@@ -59,7 +60,7 @@ fi
 
 echo "➡️ ➡️  Juntando archivos fastq.gz..."
 list_of_sample_ids=$(ls data | grep fastq | cut -d "-" -f1 | sort | uniq)
-# Merge the samples into a single file
+# Merge the samples into a single file. Recorremos cada nombre de muestra
 for sid in $list_of_sample_ids
 do
     echo "➡️  $sid"
@@ -78,7 +79,7 @@ printf -- '=%.0s' {1..150}; printf "\n\n"
 echo "➡️ ➡️  Eliminando adaptadores..."
 mkdir -p log/cutadapt
 mkdir -p out/trimmed
-for fname in out/merged/*.fastq.gz
+for fname in out/merged/*.fastq.gz #Para cada archivo fastq.gz en la carpeta out/merged
 do
     id=$(basename $fname .fastq.gz)
     echo "➡️  $sid"
@@ -95,7 +96,7 @@ printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # run STAR for all trimmed files
 echo "➡️ ➡️  Eliminando contaminantes..."
-for fname in out/trimmed/*.fastq.gz
+for fname in out/trimmed/*.fastq.gz #Para cada archivo fastq.gz en la carpeta out/trimmed
 do
     # you will need to obtain the sample ID from the filename
     sid=$(basename $fname .trimmed.fastq.gz)
