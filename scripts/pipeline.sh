@@ -24,7 +24,7 @@ printf -- '=%.0s' {1..150}; printf "\n\n"
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
 echo "➡️ ➡️  Descargando archivo de contaminantes..."
-bash scripts/download.sh $contaminants_url res yes $contaminants_filter
+bash scripts/download.sh $contaminants_url res yes "$contaminants_filter"
 printf -- '=%.0s' {1..150}; printf "\n\n"
 
 # Index the contaminants file

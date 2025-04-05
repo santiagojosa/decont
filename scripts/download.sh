@@ -28,7 +28,7 @@ echo from url: $url
 echo filename: $filename
 echo to directory: $directory/
 if [ "$uncompress" == "yes" ]; then echo uncompress: $uncompress; fi
-if [ -n "$filter" ]; then echo filter out containing: $filter; fi
+if [ -n "$filter" ]; then echo filter out containing: "$filter"; fi
 
 mkdir -p $directory
 
@@ -50,7 +50,7 @@ fi
 if [ -n "$filter" ]
 then
 	unzipped_file=$(basename $filename .gz)
-	echo 🔍 Filtrando $unzipped_file con patrón: $filter
+	echo 🔍 Filtrando $unzipped_file con patrón: "$filter"
 	seqkit grep -r -n -p "$filter" $directory/$unzipped_file -v -o $directory/$unzipped_file.tmp || { echo "❌ Error al filtrar $filename"; exit 1; }
 	# ejecuta seqkit grep con los argumentos:
 	# -r: usa regexp
