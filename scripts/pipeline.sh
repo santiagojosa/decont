@@ -29,9 +29,9 @@ tmp_err=$(mktemp log/stderr_download_XXXXXX) #Variable temporal en carpeta log p
 #trap 'rm -f "$tmp_err"' EXIT INT TERM #Borra el archivo temporal al salir del script, haya error o no, o si detengo el script
 xargs -a "$input_urls" -I {} bash scripts/download.sh {} data 2>> "$tmp_err" #Si hay error (md5sum erroneo, por ejemplo), se guarda en stderr en tmp_err
 #xargs lee el archivo linea por linea y ejecuta el script metiendo en {} cada url
-if [ -s "$tmp_err" ]; then #Comprueba si el archivo temporal tiene contenido, que sera la salida de error
-  echo "❌❌ Se produjeron errores al descargar archivos. Revisa log/stderr_download:"
-  cat "$tmp_err"
+if grep -q 'Error en el MD5 check' "$tmp_err"; then #Comprueba si el archivo temporal tiene contenido, que sera la salida de error
+  echo "❌❌ Se produjeron errores al descargar archivos. Revisa si hay mensajes de error en las lineas previas."
+  #cat "$tmp_err"
   exit 1
 fi
 printf -- '=%.0s' {1..150}; printf "\n\n"

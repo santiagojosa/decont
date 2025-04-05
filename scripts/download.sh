@@ -51,7 +51,7 @@ if [ "$md5_online" == "$md5_downloaded" ]
 then
 	echo ✅ MD5 check correcto
 else
-	echo ❌ Error en el MD5 check >&2 #redirecciona el error a stderr
+	echo ❌ Error en el MD5 check | tee /dev/stderr #se ve el mensaje y lo redirecciona el error a stderr
 	exit 1
 fi
 (printf -- '-%.0s' {1..150}; echo) 
